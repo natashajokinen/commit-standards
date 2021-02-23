@@ -9,7 +9,8 @@
   "keywords": [
     "probot",
     "github",
-    "probot-app"
+    "probot-app",
+    "commit-standards"
   ],
   "scripts": {
     "start": "probot run ./index.js",

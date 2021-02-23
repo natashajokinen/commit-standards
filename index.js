@@ -1,42 +1,47 @@
-// Checks API example
-// See: https://developer.github.com/v3/checks/ to learn more
+
+const DEFAULT_OPTIONS = {
+  regexArray: [/^(?:feat|fix|docs|style|refactor|perf|test|chore|revert|demo|deprecate)(?:\(.+\))?: [^A-Z ].+[^\.]$/],
+  commitStandardsDocumentation: 'https://github.com/natashajokinen/commit-standards',
+};
 
 /**
  * This is the main entrypoint to your Probot app
  * @param {import('probot').Probot} app
  */
 module.exports = (app) => {
-  app.on(["check_suite.requested", "check_run.rerequested"], check);
+  app.on(['pull_request.opened', 'pull_request.synchronize'], async (context) => {
+      //TODO write getConfig
+      // const userConfig = await getConfig(context, 'commit-standards.yml', {});
+      // const {regexArray} = Object.assign({}, DEFAULT_OPTIONS, userConfig);
+      const {commitStandardsDocumentation, regexArray} = Object.assign({}, DEFAULT_OPTIONS);
 
-  async function check(context) {
-    const startTime = new Date();
+      const pullRequestObj = context.repo({
+        pull_number: context.payload.pull_request.number
+      });
+      const commitInfo = await context.octokit.pulls.listCommits(pullRequestObj);
+      const commits = commitInfo.data;
+      const areCommitsStandard = verifyCommits(commits, regexArray);
 
-    // Do stuff
-    const {
-      head_branch: headBranch,
-      head_sha: headSha,
-    } = context.payload.check_suite;
-    // Probot API note: context.repo() => {username: 'hiimbex', repo: 'testing-things'}
-    return context.octokit.checks.create(
-      context.repo({
-        name: "My app!",
-        head_branch: headBranch,
-        head_sha: headSha,
-        status: "completed",
-        started_at: startTime,
-        conclusion: "success",
-        completed_at: new Date(),
-        output: {
-          title: "Probot check!",
-          summary: "The check has passed!",
-        },
-      })
-    );
-  }
+      const status = {
+        sha: context.payload.pull_request.head.sha,
+        state: areCommitsStandard ? 'success' : 'failure',
+        description: areCommitsStandard ? 'commits are following standards' : 'every commit needs to follow commit standards',
+        context: 'Following Commit Standards',
+        target_url: commitStandardsDocumentation,
+      };
+      const result = await context.octokit.repos.createCommitStatus(context.repo(status));
+      return result;
+    }
+  );
+};
 
-  // For more information on building apps:
-  // https://probot.github.io/docs/
+function verifyCommits(commits, regexArray) {
+  return commits.map(fullCommit => fullCommit.commit).every(commit => matchesStandards(commit.message, regexArray));
+};
 
-  // To get your app running against GitHub, see:
-  // https://probot.github.io/docs/development/
+function matchesStandards(message, regexArray) {
+  const messageLines = message.split(/\r?\n/);
+  return regexArray.every((regex, index) => {
+    return regex.test(messageLines[index]);
+  });
 };
