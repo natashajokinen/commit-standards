@@ -1,6 +1,32 @@
 {
   "name": "commit-standards",
+  "version": "1.0.0",
+  "private": true,
   "description": "Verify commit messages follow configured standards",
-  "author": "Natasha Jokinen",
-  "license": "ISC"
+  "author": "Natasha Jokinen <https://github.com/natashajokinen>",
+  "license": "ISC",
+  "homepage": "https://github.com/natashajokinen/commit-standards",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "start": "probot run ./index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "probot": "^11.0.1"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "nock": "^13.0.5",
+    "smee-client": "^1.2.2"
+  },
+  "engines": {
+    "node": ">= 10.13.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
 }
