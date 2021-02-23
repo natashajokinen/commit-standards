@@ -1,0 +1,6 @@
+{
+  "name": "commit-standards",
+  "description": "Verify commit messages follow configured standards",
+  "author": "Natasha Jokinen",
+  "license": "ISC"
+}
