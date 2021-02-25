@@ -1,7 +1,8 @@
 
 const DEFAULT_OPTIONS = {
-  regexArray: ['^(?:feat|fix|docs|style|refactor|perf|test|chore|revert|demo|deprecate)(?:\(.+\))?: [^A-Z ].+[^\.]$'],
+  allowMergeCommits: true,
   commitStandardsDocumentation: 'https://github.com/natashajokinen/commit-standards',
+  regexArray: ['^(?:feat|fix|docs|style|refactor|perf|test|chore|revert|demo|deprecate)(?:\(.+\))?: [^A-Z ].+[^\.]$'],
 };
 
 /**
@@ -11,7 +12,7 @@ const DEFAULT_OPTIONS = {
 module.exports = (app) => {
   app.on(['pull_request.opened', 'pull_request.synchronize'], async (context) => {
       const userConfig = await context.config('commit-standards.yml');
-      let {commitStandardsDocumentation, regexArray} = Object.assign({}, DEFAULT_OPTIONS, userConfig);
+      let {allowMergeCommits, commitStandardsDocumentation, regexArray} = Object.assign({}, DEFAULT_OPTIONS, userConfig);
       regexArray = regexArray.map((regex)=> new RegExp(regex));
 
       const pullRequestObj = context.repo({
@@ -19,7 +20,7 @@ module.exports = (app) => {
       });
       const commitInfo = await context.octokit.pulls.listCommits(pullRequestObj);
       const commits = commitInfo.data;
-      const {areCommitsStandard, invalidCommit = ''} = verifyCommits(commits, regexArray);
+      const {areCommitsStandard, invalidCommit = ''} = verifyCommits(commits, regexArray, allowMergeCommits);
 
       const status = {
         sha: context.payload.pull_request.head.sha,
@@ -34,10 +35,10 @@ module.exports = (app) => {
   );
 };
 
-function verifyCommits(commits, regexArray) {
+function verifyCommits(commits, regexArray, allowMergeCommits) {
   let invalidCommit;
   const areCommitsStandard = commits.map(fullCommit => fullCommit.commit).every((commit, index) => {
-    const matches = matchesStandards(commit.message, regexArray);
+    const matches = matchesStandards(commit.message, regexArray, allowMergeCommits);
     if (!matches) {
       invalidCommit = commits[index].sha.slice(0,7);
     };
@@ -49,8 +50,11 @@ function verifyCommits(commits, regexArray) {
   };
 };
 
-function matchesStandards(message, regexArray) {
+function matchesStandards(message, regexArray, allowMergeCommits) {
   const messageLines = message.split(/\r?\n/);
+  if (allowMergeCommits && messageLines[0].slice(0,5) === 'Merge') {
+    return true;
+  }
   return regexArray.every((regex, index) => {
     return regex.test(messageLines[index]);
   });

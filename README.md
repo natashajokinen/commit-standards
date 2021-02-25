@@ -4,7 +4,7 @@ A Github App that verifies all commits in a PR follow the configured standards. 
 
 ## Configuration
 
-The standards enforced can be configured by the repo. Just add a `commit-standards.yml` file to the .`github` directory of the repo. 
+Configuration isn't required but the standards enforced can be configured by the repo. Just add a `commit-standards.yml` file to the .`github` directory of the repo. 
 
 ```
 # Each line of the file can contain a regex pattern that a commit must match.
@@ -12,7 +12,7 @@ The standards enforced can be configured by the repo. Just add a `commit-standar
 # the `commit-standards.yml` are not matched.
 # A line that should only be a new line should be indicated with an empty string `''`
 regexArray:
-  - '^(?:feat|fix|docs|style|refactor|perf|test|chore|revert|demo|deprecate)(?:\(.+\))?: [^A-Z ].+[^\.]$'
+  - '^(?:docs|test)(?:\(.+\))?: [^A-Z ].+[^\.]$'
   - ''
   - 'description'
 ```
@@ -20,6 +20,12 @@ regexArray:
 ```
 # You can add a link to where the commit standards configured here are documented
 commitStandardsDocumentation: 'https://github.com/natashajokinen/commit-standards'
+```
+
+```
+# Allow use of Merge commits (eg on github: "Merge branch 'main' into feature/cool-idea")
+# By default this is true
+allowMergeCommits: true
 ```
 
 The default configured standards are the same as the [conventional commits definition](https://conventionalcommits.org/) with additional requirements that:
