@@ -2,9 +2,19 @@
 
 A Github App that verifies all commits in a PR follow the configured standards. Your answer to "my repo follows the community standard except..." or for easily enforcing your own standard.
 
+## What does commit-standards do?
+
+In a pull request, commit-standards will check that every commit message matches the configured regex pattern. The first commit that doesn't match the standard will be indicated in the failed status check.
+
+![image](https://user-images.githubusercontent.com/76977006/109399743-a6d0b500-7912-11eb-91c1-cebba1729d95.png)
+
+Use `git commit --amend` or `git rebase -i` to write a commit message following the standards. Once all the commits are complying with the standards the status check will pass.
+
+![image](https://user-images.githubusercontent.com/76977006/109400058-7d188d80-7914-11eb-99b2-81b7e60f416f.png)
+
 ## Configuration
 
-Configuration isn't required but the standards enforced can be configured by the repo. Just add a `commit-standards.yml` file to the .`github` directory of the repo. 
+Configuration isn't required but the standards enforced can be configured by the repo. Just add a `commit-standards.yml` file to the .`github` directory of the repo.
 
 ```
 # Each line of the file can contain a regex pattern that a commit must match.
@@ -43,6 +53,8 @@ The default configured standards are the same as the [conventional commits defin
   * `revert`
   * `demo`
   * `deprecate`
+
+
 
 ## Alternatives
 
