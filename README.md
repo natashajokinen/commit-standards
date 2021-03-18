@@ -6,7 +6,7 @@ A Github App that verifies all commits in a PR follow the configured standards. 
 
 In a pull request, commit-standards will check that every commit message matches the configured regex pattern. The first commit that doesn't match the standard will be indicated in the failed status check.
 
-![image](https://user-images.githubusercontent.com/76977006/109399743-a6d0b500-7912-11eb-91c1-cebba1729d95.png)
+![image](https://user-images.githubusercontent.com/76977006/111566024-d71dad80-8772-11eb-8747-d0d5c99fb790.png)
 
 Use `git commit --amend` or `git rebase -i` to write a commit message following the standards. Once all the commits are complying with the standards the status check will pass.
 

@@ -25,8 +25,8 @@ module.exports = (app) => {
       const status = {
         sha: context.payload.pull_request.head.sha,
         state: areCommitsStandard ? 'success' : 'failure',
-        description: areCommitsStandard ? 'Commits are following standards' : `Commit ${invalidCommit} doesn't follow commit standards.`,
-        context: 'Following Commit Standards',
+        description: areCommitsStandard ? 'Commits are following standards' : `Commit ${invalidCommit} doesn't follow commit standards. To fix run \`git commit --amend\` or \`git rebase -i\``,
+        context: 'Commit Standards',
         target_url: commitStandardsDocumentation,
       };
       const result = await context.octokit.repos.createCommitStatus(context.repo(status));
