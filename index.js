@@ -9,7 +9,7 @@ const DEFAULT_OPTIONS = {
  * This is the main entrypoint to your Probot app
  * @param {import('probot').Probot} app
  */
-module.exports = (app) => {
+module.exports = (app, {getRouter}) => {
   app.on(['pull_request.opened', 'pull_request.synchronize'], async (context) => {
       const userConfig = await context.config('commit-standards.yml');
       let {allowMergeCommits, commitStandardsDocumentation, regexArray} = Object.assign({}, DEFAULT_OPTIONS, userConfig);
@@ -33,6 +33,12 @@ module.exports = (app) => {
       return result;
     }
   );
+
+  const router = getRouter('/commit-standards');
+  router.use(require('express').static('public'));
+  router.get('/healthcheck', (req, res) => {
+    res.send('OK');
+  });
 };
 
 function verifyCommits(commits, regexArray, allowMergeCommits) {
